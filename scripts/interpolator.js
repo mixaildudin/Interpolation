@@ -1,3 +1,8 @@
+window.onload = function() {
+    var o = new Interpolator();
+    o.countFiniteDiffs();
+}
+
 /**
  * Создает объект Интерполятор, который будет производить все вычисления
  * @constructor
@@ -9,30 +14,41 @@ function Interpolator( ) {
     this.nodesNum;
     this.windowA, this.windowB, this.windowC, this.windowD;
     this.delta;
+    this.step; //шаг интерполяции
 
-    function func( x, alpha, beta, gamma, delta, eps ) {
+    Interpolator.prototype.func = function( x, alpha, beta, gamma, delta, eps ) {
         return delta * Math.cos(beta * x / (alpha*alpha - x*x)) + eps*Math.sin( gamma * x );
     }
 
-    function setNodesNum( n ) {
+    Interpolator.prototype.interpolate = function() {
+        this.step = (this.windowB - this.windowA) / (n-1);
+    }
+
+    Interpolator.prototype.countFiniteDiffs = function() {
+        alert(1);
+    }
+
+
+
+    /*Interpolator.prototype.setNodesNum = function( n ) {
         var LOWER_BOUND = 0, HIGHER_BOUND = 200;
-        var correct = ( n > LOWER_BOUND && n <= HIGHER_BOUND );
+        var correct = isNumber(n) && ( n > LOWER_BOUND && n <= HIGHER_BOUND );
         if( correct )
             this.nodesNum = n;
         else
-            alert( "Количество узлов интерполяции должно быть от " + LOWER_BOUND + " до " + HIGHER_BOUND );
+            alert( "Количество узлов интерполяции должно быть числом от " + LOWER_BOUND + " до " + HIGHER_BOUND );
 
         return correct;
     }
 
-    function setIntrplWindow( a, b, c, d ) {
+    Interpolator.prototype.setIntrplWindow = function( a, b, c, d ) {
         var LOWER_BOUND = -100, HIGHER_BOUND = 100;
         var correct = true;
 
-        correct &= a >= LOWER_BOUND && a <= HIGHER_BOUND;
-        correct &= b >= LOWER_BOUND && b <= HIGHER_BOUND;
-        correct &= c >= LOWER_BOUND && c <= HIGHER_BOUND;
-        correct &= d >= LOWER_BOUND && d <= HIGHER_BOUND;
+        correct &= isNumber(a) >= LOWER_BOUND && a <= HIGHER_BOUND;
+        correct &= isNumber(b) >= LOWER_BOUND && b <= HIGHER_BOUND;
+        correct &= isNumber(c) >= LOWER_BOUND && c <= HIGHER_BOUND;
+        correct &= isNumber(d)  >= LOWER_BOUND && d <= HIGHER_BOUND;
 
         if( correct ) {
             this.windowA = a;
@@ -41,17 +57,17 @@ function Interpolator( ) {
             this.windowD = d;
         }
         else
-            alert( "Все координаты точек, задающих размер окна, должны быть в диапазоне от " + LOWER_BOUND + " до " + HIGHER_BOUND );
+            alert( "Все координаты точек, задающих размер окна, должны быть числами в диапазоне от " + LOWER_BOUND + " до " + HIGHER_BOUND );
 
         return correct;
     }
 
-    function setDelta( d ) {
+    Interpolator.prototype.setDelta = function( d ) {
         var ALLOWED_VALUES = [ 1, 1e-1, 1e-2, 1e-3, 1e-4 ];
-        var correct = true;
+        var correct = isNumber(d);
 
         for (var i = 0; i < ALLOWED_VALUES.length; i++) {
-            correct |= ALLOWED_VALUES[i];
+            correct |= (d == ALLOWED_VALUES[i]);
         }
 
         if( correct )
@@ -65,8 +81,5 @@ function Interpolator( ) {
         }
 
         return correct;
-    }
-
-    //function countFiniteDiffs(
-
+    }*/
 }
