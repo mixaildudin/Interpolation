@@ -1,34 +1,56 @@
+var o;
 window.onload = function() {
-    var o = new Interpolator();
-    o.countFiniteDiffs();
+    var w = { A: 0, B: 3, C: 0, D: 1 };
+    o = new Interpolator( 6, w );
+
 }
 
 /**
- * Создает объект Интерполятор, который будет производить все вычисления
- * @constructor
+ *
+ * @constructor Создает объект Интерполятор, который будет производить все вычисления
+ * @param n Количество узлов интерполяции
+ * @param intplnWindow Размеры области интерполирования
  */
 
-function Interpolator( ) {
-
+function Interpolator( n, intplnWindow ) {
     this.finiteDifferences = [];
-    this.nodesNum;
-    this.windowA, this.windowB, this.windowC, this.windowD;
+    this.nodesNum = n;
+    this.windowA = intplnWindow.A;
+    this.windowB = intplnWindow.B;
+    this.windowC = intplnWindow.C;
+    this.windowD = intplnWindow.D;
+    this.poly = new BesselPoly( this.finiteDifferences );
+
     this.delta;
-    this.step; //шаг интерполяции
+    this.step = (this.windowB - this.windowA) / ( this.nodesNum ); //расстояние между узлами
 
     Interpolator.prototype.func = function( x, alpha, beta, gamma, delta, eps ) {
         return delta * Math.cos(beta * x / (alpha*alpha - x*x)) + eps*Math.sin( gamma * x );
+    };
+
+    Interpolator.prototype.start = function() {
+        var nodes = this.createNodeList();
+        var values = [];
+        for( var i = 0; i < nodes.length; i++ )
+            values.push( this.func(nodes[i], 5, 1, 1, 1, 1) );
     }
 
-    Interpolator.prototype.interpolate = function() {
-        this.step = (this.windowB - this.windowA) / (n-1);
+    Interpolator.prototype.createNodeList = function() {
+        var res = [], x0 = this.windowA,
+            nodesNum = this.nodesNum;
+        for( var i = -nodesNum; i < nodesNum+1; i++ )
+            res.push( x0 + i * this.step );
+
+        return res;
     }
 
-    Interpolator.prototype.countFiniteDiffs = function() {
-        alert(1);
-    }
+    Interpolator.prototype.countFiniteDiffs = function () {
 
+    };
 
+    Interpolator.prototype.setNodesNum = function( n ) {
+        this.nodesNum = n;
+    };
 
     /*Interpolator.prototype.setNodesNum = function( n ) {
         var LOWER_BOUND = 0, HIGHER_BOUND = 200;
