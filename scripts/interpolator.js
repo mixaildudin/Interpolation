@@ -1,7 +1,7 @@
 var o;
 window.onload = function() {
     var w = { A: 0, B: 3, C: 0, D: 1 };
-    o = new Interpolator( 6, w );
+    o = new Interpolator( 50, w );
 
 }
 
@@ -19,36 +19,57 @@ function Interpolator( n, intplnWindow ) {
     this.windowB = intplnWindow.B;
     this.windowC = intplnWindow.C;
     this.windowD = intplnWindow.D;
-    this.poly = new BesselPoly( this.finiteDifferences );
+    var poly = new BesselPoly( this.finiteDifferences );
+    var func = new ObjFunc( 1, 0, 1, 1, 1 );
 
     this.delta;
-    this.step = (this.windowB - this.windowA) / ( this.nodesNum ); //расстояние между узлами
+    this.step = (this.windowB - this.windowA) / ( 2*this.nodesNum+1 ); //расстояние между узлами
 
-    Interpolator.prototype.func = function( x, alpha, beta, gamma, delta, eps ) {
-        return delta * Math.cos(beta * x / (alpha*alpha - x*x)) + eps*Math.sin( gamma * x );
-    };
+    this.start = function() {
 
-    Interpolator.prototype.start = function() {
-        var nodes = this.createNodeList();
-        var values = [];
-        for( var i = 0; i < nodes.length; i++ )
-            values.push( this.func(nodes[i], 5, 1, 1, 1, 1) );
     }
 
-    Interpolator.prototype.createNodeList = function() {
-        var res = [], x0 = this.windowA,
-            nodesNum = this.nodesNum;
-        for( var i = -nodesNum; i < nodesNum+1; i++ )
-            res.push( x0 + i * this.step );
+    /**
+     * Создать массив узлов интерполяции для подсчета симметрических разностей
+     * @returns {Array} Искомый массив
+     */
+    this.initFiniteDiffs = function() {
+        var res = [],
+            n = this.nodesNum;
+
+        for( var i = 0; i < 2*(2*n+2)-1; i++ ) {
+            var x = this.windowA + i * this.step/2;
+            res.push( func.getValue(x) );
+        }
 
         return res;
     }
 
-    Interpolator.prototype.countFiniteDiffs = function () {
+    /**
+     * Найти конечные (симметрические) разности
+     * @returns {Array} Массив необходимых нам разностей (центральная линия в треугольнике)
+     */
+    this.countFiniteDiffs = function () {
+        var values = [];
+        var finiteDiffs = this.initFiniteDiffs();
+        values.push( finiteDiffs[(finiteDiffs.length-1)/ 2] );
 
+        for( var i = 0; i < 2*this.nodesNum + 1; i++ ) {
+            finiteDiffs = this.getNextFiniteDiffs( finiteDiffs );
+            values.push( finiteDiffs[(finiteDiffs.length-1)/ 2] );
+        }
+        return values;
     };
 
-    Interpolator.prototype.setNodesNum = function( n ) {
+    this.getNextFiniteDiffs = function( current ) {
+        var result = [];
+        for (var i = 1; i < current.length - 1; i++) {
+            result.push( current[i+1] - current[i-1] );
+        }
+        return result;
+    }
+
+   this.setNodesNum = function( n ) {
         this.nodesNum = n;
     };
 
