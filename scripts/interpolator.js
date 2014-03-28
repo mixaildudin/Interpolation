@@ -1,44 +1,55 @@
 var o;
 window.onload = function() {
-    var w = { A: 0, B: 3, C: 0, D: 1 };
-    o = new Interpolator( 50, w );
+    var w = { A: 0, B: 1, C: 0, D: 1 };
+    o = new Interpolator( 2, w );
 
 }
 
 /**
- *
  * @constructor Создает объект Интерполятор, который будет производить все вычисления
  * @param n Количество узлов интерполяции
  * @param intplnWindow Размеры области интерполирования
  */
 
 function Interpolator( n, intplnWindow ) {
-    this.finiteDifferences = [];
-    this.nodesNum = n;
-    this.windowA = intplnWindow.A;
-    this.windowB = intplnWindow.B;
-    this.windowC = intplnWindow.C;
-    this.windowD = intplnWindow.D;
-    var poly = new BesselPoly( this.finiteDifferences );
+    var nodesNum = n;
+    var windowA = intplnWindow.A,
+        windowB = intplnWindow.B,
+        windowC = intplnWindow.C,
+        windowD = intplnWindow.D;
+    var delta;
+    var step = (windowB - windowA) / ( 2*nodesNum+1 ); //расстояние между узлами
+    var x0 = (windowB - windowA)/2 - step/2;
+
     var func = new ObjFunc( 1, 0, 1, 1, 1 );
 
-    this.delta;
-    this.step = (this.windowB - this.windowA) / ( 2*this.nodesNum+1 ); //расстояние между узлами
-
     this.start = function() {
+        var finiteDifferences = countFiniteDiffs();
+        var points = [];
+        var poly = new BesselPoly( x0, step, finiteDifferences );
 
+        console.log( finiteDifferences );
+
+        for( var i = 0; i < 2*n+1; i++ ) {
+            var x = windowA + i * step;
+            points.push(x);
+        }
+
+        /*for( var i = 0; i < 2*n; i++ ) {
+            console.log( func.getValue(points[i]) + "\t" + poly.getValue( points[i] ) + "\n" );
+        }*/
     }
 
     /**
-     * Создать массив узлов интерполяции для подсчета симметрических разностей
+     * Создать массив значений функции в узлах интерполяции для подсчета симметрических разностей
      * @returns {Array} Искомый массив
      */
-    this.initFiniteDiffs = function() {
+    function initFiniteDiffs() {
         var res = [],
-            n = this.nodesNum;
+            n = nodesNum;
 
-        for( var i = 0; i < 2*(2*n+2)-1; i++ ) {
-            var x = this.windowA + i * this.step/2;
+        for( var i = 0; i < 2*n+2; i++ ) {
+            var x = windowA + i * step;
             res.push( func.getValue(x) );
         }
 
@@ -49,29 +60,43 @@ function Interpolator( n, intplnWindow ) {
      * Найти конечные (симметрические) разности
      * @returns {Array} Массив необходимых нам разностей (центральная линия в треугольнике)
      */
-    this.countFiniteDiffs = function () {
+    function countFiniteDiffs() {
         var values = [];
-        var finiteDiffs = this.initFiniteDiffs();
-        values.push( finiteDiffs[(finiteDiffs.length-1)/ 2] );
+        var intermediateDiffs = initFiniteDiffs();
 
-        for( var i = 0; i < 2*this.nodesNum + 1; i++ ) {
-            finiteDiffs = this.getNextFiniteDiffs( finiteDiffs );
-            values.push( finiteDiffs[(finiteDiffs.length-1)/ 2] );
+        for( var i = 0; i < 2*nodesNum + 2; i++ ) {
+            if( i%2 == 0 ) {
+                var f0 = intermediateDiffs[ (intermediateDiffs.length/2) - 1],
+                    f1 = intermediateDiffs[ (intermediateDiffs.length/2) ];
+                values.push( getMu(f0, f1) );
+            }
+            else if( i%2 == 1 ) {
+                values.push( intermediateDiffs[(intermediateDiffs.length-1)/ 2] );
+            }
+            intermediateDiffs = getNextFiniteDiffs( intermediateDiffs );
         }
         return values;
     };
 
-    this.getNextFiniteDiffs = function( current ) {
+    function getNextFiniteDiffs( current ) {
         var result = [];
-        for (var i = 1; i < current.length - 1; i++) {
-            result.push( current[i+1] - current[i-1] );
+        for (var i = 1; i < current.length; i++) {
+            result.push( current[i] - current[i-1] );
         }
         return result;
     }
 
-   this.setNodesNum = function( n ) {
-        this.nodesNum = n;
+    function getMu( a, b ) {
+        return (b+a)/2;
+    }
+
+    this.setNodesNum = function( n ) {
+        nodesNum = n;
     };
+
+    this.getNodesNum = function() {
+        return nodesNum;
+    }
 
     /*Interpolator.prototype.setNodesNum = function( n ) {
         var LOWER_BOUND = 0, HIGHER_BOUND = 200;
