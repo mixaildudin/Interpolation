@@ -1,7 +1,7 @@
 var o;
 window.onload = function() {
-    var w = { A: 0, B: 1, C: 0, D: 1 };
-    o = new Interpolator( 2, w );
+    var w = { A: 0, B: 70, C: 0, D: 1 };
+    o = new Interpolator( 40, w );
 
 }
 
@@ -20,6 +20,9 @@ function Interpolator( n, intplnWindow ) {
     var delta;
     var step = (windowB - windowA) / ( 2*nodesNum+1 ); //расстояние между узлами
     var x0 = (windowB - windowA)/2 - step/2;
+	
+	console.log( "step: " + step);
+	console.log("x0: " + x0);
 
     var func = new ObjFunc( 1, 0, 1, 1, 1 );
 
@@ -35,9 +38,10 @@ function Interpolator( n, intplnWindow ) {
             points.push(x);
         }
 
-        /*for( var i = 0; i < 2*n; i++ ) {
-            console.log( func.getValue(points[i]) + "\t" + poly.getValue( points[i] ) + "\n" );
-        }*/
+		console.log( "POINT\t\t\t\tFUNCTION\t\t\t\tPOLY" );
+        for( var i = 0; i < 2*n; i++ ) {
+            console.log( points[i] + "\t" + func.getValue(points[i]) + "\t" + poly.getValue( points[i] ) + "\n" );
+        }
     }
 
     /**
