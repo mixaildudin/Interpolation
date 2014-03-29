@@ -5,3 +5,7 @@ function isNumber( n ) {
 function sqr( n ) {
 	return n*n;
 }
+
+function getEl( id ) {
+	return document.getElementById( id );
+}
