@@ -4,35 +4,35 @@ function BesselPoly( _x0, _h, _differences ) {
         differences = _differences;
 
     this.getValue = function( x ) {
-        var t = (x0 - x)/h,
+        var t = (x - x0)/h,
             result,
-            coeff = t;
+			accumulator = t;
 
         result = differences[0];
         result += (t-0.5)*differences[1];
 
         for (var i = 2; i < differences.length; i++) {
-            coeff = getCoeff( i, t, coeff );
+            var coeff = getCoeff( i, t );
             result += coeff * differences[i];
         }
 
         return result;
-    }
+		
+		function getCoeff( i, t ) {
+			var n = Math.floor( i/2 );
+			
+			accumulator /= i;
+			
+			var res = accumulator;
+			if( i%2 == 0 ) {
+				if( n > 1 )
+					accumulator *= (sqr(t) - sqr(n-1));
+				res = accumulator*( t-n );
+			}
+			else if( i%2 == 1 )
+				res = accumulator*( t-n )*( t-0.5 );
 
-    //TODO:
-    function getCoeff( i, t, prevMember ) {
-        var factor = prevMember,
-            n = Math.floor( i/2 );
-        if( i%2 == 1 ) {
-            factor *= ( t - 0.5 );
-        }
-        else {
-            factor *= ( t - n );
-            if( n != 1 )
-                factor *= ( t*t - n*n );
-        }
-        factor /= i;
-
-        return factor;
+			return res;
+		}
     }
 }
