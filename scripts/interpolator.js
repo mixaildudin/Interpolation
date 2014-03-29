@@ -1,17 +1,11 @@
-var o;
-window.onload = function() {
-    var w = { A: 0, B: 70, C: 0, D: 1 };
-    o = new Interpolator( 40, w );
-
-}
-
 /**
  * @constructor Создает объект Интерполятор, который будет производить все вычисления
+ * @param func Функция для интерполяции
  * @param n Количество узлов интерполяции
  * @param intplnWindow Размеры области интерполирования
  */
 
-function Interpolator( n, intplnWindow ) {
+function Interpolator( func, n, intplnWindow ) {
     var nodesNum = n;
     var windowA = intplnWindow.A,
         windowB = intplnWindow.B,
@@ -20,26 +14,22 @@ function Interpolator( n, intplnWindow ) {
     var delta;
     var step = (windowB - windowA) / ( 2*nodesNum+1 ); //расстояние между узлами
     var x0 = (windowB - windowA)/2 - step/2;
-	
-	console.log( "step: " + step);
-	console.log("x0: " + x0);
-
-    var func = new ObjFunc( 1, 0, 1, 1, 1 );
+	var poly;
 
     this.start = function() {
         var finiteDifferences = countFiniteDiffs();
         var points = [];
-        var poly = new BesselPoly( x0, step, finiteDifferences );
+        poly = new BesselPoly( x0, step, finiteDifferences );
 
         console.log( finiteDifferences );
 
-        for( var i = 0; i < 2*n+1; i++ ) {
+        for( var i = 0; i < 2*n+2; i++ ) {
             var x = windowA + i * step;
             points.push(x);
         }
 
 		console.log( "POINT\t\t\t\tFUNCTION\t\t\t\tPOLY" );
-        for( var i = 0; i < 2*n; i++ ) {
+        for( var i = 0; i < 2*n+2; i++ ) {
             console.log( points[i] + "\t" + func.getValue(points[i]) + "\t" + poly.getValue( points[i] ) + "\n" );
         }
     }
@@ -101,6 +91,38 @@ function Interpolator( n, intplnWindow ) {
     this.getNodesNum = function() {
         return nodesNum;
     }
+
+	this.setObjFunction = function( f ) {
+		func = f;
+	}
+
+	this.getXPoints = function() {
+		var res = [];
+		for( var x = windowA; x <= windowB; x += step )
+			res.push(x);
+
+		return res;
+	}
+
+	this.countFuncValues = function( points ) {
+		var res = [];
+		for ( var i = 0; i < points.length; i++ ) {
+			var x = points[i];
+			res.push( func.getValue(x) );
+		}
+
+		return res;
+	}
+
+	this.countPolyValues = function( points ) {
+		var res = [];
+		for ( var i = 0; i < points.length; i++ ) {
+			var x = points[i];
+			res.push( poly.getValue(x) );
+		}
+
+		return res;
+	}
 
     /*Interpolator.prototype.setNodesNum = function( n ) {
         var LOWER_BOUND = 0, HIGHER_BOUND = 200;

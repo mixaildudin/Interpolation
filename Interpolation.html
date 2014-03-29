@@ -1,14 +1,61 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <link rel="stylesheet" type="text/css" href="style.css">
     <script type="text/javascript" src="scripts/interpolator.js"></script>
     <script type="text/javascript" src="scripts/utils.js"></script>
     <script type="text/javascript" src="scripts/bessel_polynomial.js"></script>
     <script type="text/javascript" src="scripts/obj_function.js"></script>
+    <script type="text/javascript" src="scripts/view.js"></script>
+    <script type="text/javascript" src="scripts/flot/jquery.js"></script>
+    <script type="text/javascript" src="scripts/flot/jquery.flot.js"></script>
+
+    <script type="text/javascript">
+        var windowA = 0, windowB = 4;
+        var n = 4;
+        $(document).ready( function() {
+            var w = { A: windowA, B: windowB, C: 0, D: 1 };
+            var func = new ObjFunc( 2, 4, 6, 1, 1 );
+            var o = new Interpolator( func, n, w );
+            var view = new View( getEl('plot') );
+
+            o.start();
+
+            var points = createPointsArray();
+            var polyPoints = createPolyPointsArray();
+            var funcValues = o.countFuncValues( points );
+            var polyValues = o.countPolyValues( points );
+
+            view.addPlot( points, funcValues, 'func' );
+            view.addPlot( points, polyValues, 'poly' );
+            view.draw();
+        });
+
+        function createPointsArray() {
+            var step = (windowB - windowA) / $('#plot').width();
+            var result = [];
+            for ( var i = windowA; i <= windowB ; i += step )
+                result.push(i);
+
+            return result;
+        }
+
+        function createPolyPointsArray() {
+            var step = (windowB - windowA) / (2*n + 1);
+            var result = [];
+            for ( var i = windowA; i < windowB ; i += step )
+                result.push(i);
+            result.push(windowB); //костыль, т.к. иначе может не соединиться с последней точкой из-за погрешностей
+
+            return result;
+        }
+    </script>
+
     <title></title>
     <meta charset="UTF-8"/>
 </head>
 <body>
-
+    <div id="plot"></div>
+    <div id="controls"></div>
 </body>
 </html>
