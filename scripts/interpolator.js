@@ -13,7 +13,7 @@ function Interpolator( func, n, intplnWindow ) {
         windowD = intplnWindow.D;
     var delta;
     var step = (windowB - windowA) / ( 2*nodesNum+1 ); //расстояние между узлами
-    var x0 = (windowB - windowA)/2 - step/2;
+    var x0 = (windowB + windowA)/2 - step/2;
 	var poly;
 
     this.start = function() {

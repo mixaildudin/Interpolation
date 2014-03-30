@@ -11,10 +11,10 @@
     <script type="text/javascript" src="scripts/flot/jquery.flot.js"></script>
 
     <script type="text/javascript">
-        var windowA = 0, windowB = 4;
+        var windowA = -2, windowB = 2, windowC = -15, windowD = 15;
         var n = 4;
         $(document).ready( function() {
-            var w = { A: windowA, B: windowB, C: 0, D: 1 };
+            var w = { A: windowA, B: windowB, C: windowC, D: windowD };
             var func = new ObjFunc( 2, 4, 6, 1, 1 );
             var o = new Interpolator( func, n, w );
             var view = new View( getEl('plot') );
@@ -22,30 +22,20 @@
             o.start();
 
             var points = createPointsArray();
-            var polyPoints = createPolyPointsArray();
             var funcValues = o.countFuncValues( points );
             var polyValues = o.countPolyValues( points );
 
             view.addPlot( points, funcValues, 'func' );
             view.addPlot( points, polyValues, 'poly' );
-            view.draw();
+            view.draw( w );
         });
 
         function createPointsArray() {
             var step = (windowB - windowA) / $('#plot').width();
             var result = [];
-            for ( var i = windowA; i <= windowB ; i += step )
-                result.push(i);
-
-            return result;
-        }
-
-        function createPolyPointsArray() {
-            var step = (windowB - windowA) / (2*n + 1);
-            var result = [];
             for ( var i = windowA; i < windowB ; i += step )
                 result.push(i);
-            result.push(windowB); //костыль, т.к. иначе может не соединиться с последней точкой из-за погрешностей
+			result.push( windowB ); //иначе правая граница может быть не учтена из-за погрешностей
 
             return result;
         }

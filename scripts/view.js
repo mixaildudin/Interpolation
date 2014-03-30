@@ -11,17 +11,15 @@ function View( placeholder ) {
 
 	}
 
-	this.draw = function() {
+	this.draw = function( w ) {
 		$.plot(placeholder, functions, {
 			xaxis: {
-				ticks: 10,
-				min: 0,
-				max: 4
+				min: w.A,
+				max: w.B
 			},
 			yaxis: {
-				ticks: 10,
-				min: -10,
-				max: 15
+				min: w.C,
+				max: w.D
 			},
 			colors : ['#f00', '#00f']
 		});
