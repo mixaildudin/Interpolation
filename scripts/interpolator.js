@@ -5,7 +5,7 @@
  * @param intplnWindow Размеры области интерполирования
  */
 
-function Interpolator( func, n, intplnWindow ) {
+function Interpolator( func, n, delta, intplnWindow ) {
     var nodesNum = n;
     var windowA = intplnWindow.A,
         windowB = intplnWindow.B,
@@ -119,6 +119,36 @@ function Interpolator( func, n, intplnWindow ) {
 		for ( var i = 0; i < points.length; i++ ) {
 			var x = points[i];
 			res.push( poly.getValue(x) );
+		}
+
+		return res;
+	}
+
+	this.countDiffValues = function( points ) {
+		var res = [];
+		for ( var i = 0; i < points.length; i++ ) {
+			var x = points[i];
+			res.push( func.getValue(x) - poly.getValue(x) );
+		}
+
+		return res;
+	}
+
+	this.countFuncDerivative = function( points ) {
+		var res = [];
+		for ( var i = 0; i < points.length; i++ ) {
+			var x = points[i];
+			res.push( (1/delta) * ( func.getValue(x+delta) - func.getValue(x) ) );
+		}
+
+		return res;
+	}
+
+	this.countPolyDerivative = function( points ) {
+		var res = [];
+		for ( var i = 0; i < points.length; i++ ) {
+			var x = points[i];
+			res.push( (1/delta) * ( poly.getValue(x+delta) - poly.getValue(x) ) );
 		}
 
 		return res;

@@ -1,6 +1,7 @@
 function View( placeholder ) {
 
 	var functions = [];
+	var colors = [];
 
 	/**
 	 * Отрисовать все графики
@@ -13,19 +14,19 @@ function View( placeholder ) {
 
 	this.draw = function( w ) {
 		$.plot(placeholder, functions, {
-			xaxis: {
+			'xaxis': {
 				min: w.A,
 				max: w.B
 			},
-			yaxis: {
+			'yaxis': {
 				min: w.C,
 				max: w.D
 			},
-			colors : ['#f00', '#00f']
+			'colors' : colors
 		});
 	}
 
-	this.addPlot = function( args, values, label ) {
+	this.addPlot = function( args, values, label, col ) {
 		var graph = [];
 		if( args.length != values.length )
 			return;
@@ -38,5 +39,12 @@ function View( placeholder ) {
 			'label': label,
 			'data': graph
 		});
+
+		colors.push( col );
+	}
+
+	this.clear = function() {
+		functions = [];
+		colors = [];
 	}
 }

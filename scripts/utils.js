@@ -1,5 +1,5 @@
 function isNumber( n ) {
-    return !isNaN(parseFloat(n)) && isFinite(n);
+	return !isNaN(parseFloat(n)) && isFinite(n);
 }
 
 function sqr( n ) {
