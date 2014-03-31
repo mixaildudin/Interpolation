@@ -3,6 +3,10 @@ function View( placeholder ) {
 	var functions = [];
 	var colors = [];
 
+	/**
+	 * Отрисовать добавленные ранее графики
+	 * @param w Объект, хранящий данные о размере и координатах "окна"
+	 */
 	this.draw = function( w ) {
 		$.plot(placeholder, functions, {
 			'xaxis': {
@@ -17,6 +21,13 @@ function View( placeholder ) {
 		});
 	}
 
+	/**
+	 * Добавить график для последующего отображения
+	 * @param args Массив из аргументов функции
+	 * @param values Массив из значений функции
+	 * @param label Подпись для легенды
+	 * @param col Цвет графика
+	 */
 	this.addPlot = function( args, values, label, col ) {
 		var graph = [];
 		if( args.length != values.length )
@@ -34,6 +45,9 @@ function View( placeholder ) {
 		colors.push( col );
 	}
 
+	/**
+	 * Очистить список графиков на построение
+	 */
 	this.clear = function() {
 		functions = [];
 		colors = [];
