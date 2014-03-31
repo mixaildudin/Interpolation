@@ -3,15 +3,6 @@ function View( placeholder ) {
 	var functions = [];
 	var colors = [];
 
-	/**
-	 * Отрисовать все графики
-	 * @param args Массив точек (ось Х)
-	 * @param values Массив массивов из значений функций в этих точках
-	 */
-	this.drawPlot = function( args, values ) {
-
-	}
-
 	this.draw = function( w ) {
 		$.plot(placeholder, functions, {
 			'xaxis': {
