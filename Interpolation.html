@@ -53,7 +53,73 @@
 	<meta charset="UTF-8"/>
 </head>
 <body>
-	<div id="plot"></div>
-	<div id="controls"></div>
+    <div id="wrapper">
+        <div id="plot"></div>
+        <div id="controls">
+            <table id="controls_table" cellspacing="0" cellpadding="0">
+                <tr>
+                    <td align="center">
+                        <b>Параметры:</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="left">
+                        <b>Параметры окна:</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center">
+                        A: <input id="windowA_input" type="text" /><br/>
+                        B: <input id="windowB_input" type="text" /><br/>
+                        C: <input id="windowC_input" type="text" /><br/>
+                        D: <input id="windowD_input" type="text" /><br/>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="left">
+                        <b>Параметры функции:</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center">
+                        α: <input id="alpha_input" type="text" /><br/>
+                        β: <input id="beta_input" type="text" /><br/>
+                        γ: <input id="gamma_input" type="text" /><br/>
+                        δ: <input id="delta_input" type="text" /><br/>
+                        ε: <input id="eps_input" type="text" /><br/>
+                        Δ: <input id="delta_deriv_input" type="text" /><br/>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="left">
+                        <b>Параметры интерполяции:</b>
+                    </td>
+                </tr>
+                <tr>
+                    <td align="center">
+                        n: <input id="n_input" type="range" min="2" max="40" step="2" value="2" />
+                        <span id="n_value" />
+
+                        <script type="text/javascript">
+                            window.onload = function() {
+                                getEl('n_value').innerHTML = getEl('n_input').value;
+                            }
+                            getEl('n_input').onchange = function() {
+                                getEl('n_value').innerHTML = this.value;
+                            }
+                        </script>
+                    </td>
+                </tr>
+                <tr>
+                    <td class="empty_td" />
+                </tr>
+                <tr>
+                    <td align="center">
+                        <input id="refresh_button" type="button" value="Перерисовать" /><br/>
+                    </td>
+                </tr>
+            </table>
+        </div>
+    </div>
 </body>
 </html>
