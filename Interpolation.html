@@ -11,6 +11,16 @@
 	<script type="text/javascript" src="scripts/flot/jquery.flot.js"></script>
     <script type="text/javascript" src="scripts/controller.js"></script>
 
+    <script type="text/javascript">
+        $(document).ready( function() {
+            var controller = new Controller();
+            controller.start();
+
+            $('.checkb').click( function() { controller.drawAccordingToChoices() });
+            $('#refresh_button').click(function() { controller.start() });
+        });
+    </script>
+
 	<title></title>
 	<meta charset="UTF-8"/>
 </head>
@@ -40,7 +50,7 @@
                         <tr>
                             <td align="center">
                                 A: <input id="windowA_input" type="text" value="0" /><br/>
-                                B: <input id="windowB_input" type="text" value="1" /><br/>
+                                B: <input id="windowB_input" type="text" value="3" /><br/>
                                 C: <input id="windowC_input" type="text" value="-15" /><br/>
                                 D: <input id="windowD_input" type="text" value="15" /><br/>
                             </td>
@@ -118,11 +128,11 @@
                         </tr>
                         <tr width="100%">
                             <td align="left" width="100%">
-                                <input id="draw_f" type="checkbox" checked="checked" /> f(x)<br/>
-                                <input id="draw_p" type="checkbox" checked="checked" /> p(x)<br/>
-                                <input id="draw_r" type="checkbox" checked="checked" /> r(x)<br/>
-                                <input id="draw_fd" type="checkbox" checked="checked" /> ∂f(x)<br/>
-                                <input id="draw_pd" type="checkbox" checked="checked" /> ∂p(x)<br/>
+                                <input id="draw_f" type="checkbox" class="checkb" checked="checked" /> f(x)<br/>
+                                <input id="draw_p" type="checkbox" class="checkb" checked="checked" /> p(x)<br/>
+                                <input id="draw_r" type="checkbox" class="checkb" checked="checked" /> r(x)<br/>
+                                <input id="draw_fd" type="checkbox" class="checkb" checked="checked" /> ∂f(x)<br/>
+                                <input id="draw_pd" type="checkbox" class="checkb" checked="checked" /> ∂p(x)<br/>
                             </td>
                         </tr>
                     </table>

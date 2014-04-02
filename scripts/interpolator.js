@@ -1,37 +1,41 @@
 /**
  * @constructor Создает объект Интерполятор, который будет производить все вычисления
- * @param func Функция для интерполяции
- * @param n Количество узлов интерполяции
- * @param intplnWindow Размеры области интерполирования
  */
 
-function Interpolator( func, n, delta, intplnWindow ) {
-    var nodesNum = n;
-    var windowA = intplnWindow.A,
-        windowB = intplnWindow.B,
-        windowC = intplnWindow.C,
-        windowD = intplnWindow.D;
-    var delta;
-    var step = (windowB - windowA) / ( 2*nodesNum+1 ); //расстояние между узлами
-    var x0 = (windowB + windowA)/2 - step/2;
-	var poly;
+function Interpolator( ) {
+	var nodesNum;
+    var intervalA, intervalB;
+    var delta,
+		step,
+    	x0,
+		func, poly;
+
+	var points = [],//массив точек, в которых будем считать значения функции, полинома и т.д.
+		funcValues = [],
+		polyValues = [],
+		diffValues = [],
+		funcDerivValues = [],
+		polyDerivValues = [],
+		maxDiff = {};
 
     this.start = function() {
+		step = (intervalB - intervalA) / ( 2*nodesNum+1 ); //расстояние между узлами;
+		x0 = (intervalB + intervalA)/2 - step/2;
         var finiteDifferences = countFiniteDiffs();
         var points = [];
         poly = new BesselPoly( x0, step, finiteDifferences );
 
-        console.log( finiteDifferences );
-
-        for( var i = 0; i < 2*n+2; i++ ) {
-            var x = windowA + i * step;
+        for( var i = 0; i < 2*nodesNum+2; i++ ) {
+            var x = intervalA + i * step;
             points.push(x);
         }
 
 		console.log( "POINT\t\t\t\tFUNCTION\t\t\t\tPOLY" );
-        for( var i = 0; i < 2*n+2; i++ ) {
+        for( var i = 0; i < 2*nodesNum+2; i++ ) {
             console.log( points[i] + "\t" + func.getValue(points[i]) + "\t" + poly.getValue( points[i] ) + "\n" );
         }
+
+		countValues();
     }
 
     /**
@@ -43,7 +47,7 @@ function Interpolator( func, n, delta, intplnWindow ) {
             n = nodesNum;
 
         for( var i = 0; i < 2*n+2; i++ ) {
-            var x = windowA + i * step;
+            var x = intervalA + i * step;
             res.push( func.getValue(x) );
         }
 
@@ -88,122 +92,109 @@ function Interpolator( func, n, delta, intplnWindow ) {
         nodesNum = n;
     };
 
-    this.getNodesNum = function() {
-        return nodesNum;
-    }
-
 	this.setObjFunction = function( f ) {
 		func = f;
 	}
 
-	this.getXPoints = function() {
+	this.setDelta = function( d ) {
+		delta = d;
+	}
+
+	this.setIntrpInterval = function( A, B ) {
+		intervalA = A;
+		intervalB = B;
+	}
+
+	/*this.getXPoints = function() {
 		var res = [];
-		for( var x = windowA; x <= windowB; x += step )
+		for( var x = intervalA; x <= intervalB; x += step )
 			res.push(x);
 
 		return res;
+	}*/
+
+	this.setPoints = function( p ) {
+		points = p;
 	}
 
-	this.countFuncValues = function( points ) {
-		var res = [];
+	function countValues() {
+		countFuncValues();
+		countPolyValues();
+		countDiffValues();
+		countFuncDerivative();
+		countPolyDerivative();
+	}
+
+	function countFuncValues() {
+		funcValues = [];
 		for ( var i = 0; i < points.length; i++ ) {
 			var x = points[i];
-			res.push( func.getValue(x) );
+			funcValues.push( func.getValue(x) );
 		}
-
-		return res;
 	}
 
-	this.countPolyValues = function( points ) {
-		var res = [];
+	this.getFuncValuesArray = function() {
+		return funcValues;
+	}
+
+	function countPolyValues() {
+		polyValues = [];
 		for ( var i = 0; i < points.length; i++ ) {
 			var x = points[i];
-			res.push( poly.getValue(x) );
+			polyValues.push( poly.getValue(x) );
 		}
-
-		return res;
 	}
 
-	this.countDiffValues = function( points ) {
-		var res = [];
+	this.getPolyValuesArray = function() {
+		return polyValues;
+	}
+
+	function countDiffValues() {
+		diffValues = [];
+		var max = -Infinity;
 		for ( var i = 0; i < points.length; i++ ) {
 			var x = points[i];
-			res.push( func.getValue(x) - poly.getValue(x) );
+			var diff = func.getValue(x) - poly.getValue(x);
+			diffValues.push( diff );
+			if( diff > max ) {
+				maxDiff = {
+					'x': points[i],
+					'val': diff
+				};
+				max = diff;
+			}
 		}
-
-		return res;
 	}
 
-	this.countFuncDerivative = function( points ) {
-		var res = [];
+	this.getDiffValuesArray = function() {
+		return diffValues;
+	}
+
+	this.getMaxDiffValue = function() {
+		return maxDiff;
+	}
+
+	function countFuncDerivative() {
+		funcDerivValues = [];
 		for ( var i = 0; i < points.length; i++ ) {
 			var x = points[i];
-			res.push( (1/delta) * ( func.getValue(x+delta) - func.getValue(x) ) );
+			funcDerivValues.push( (1/delta) * ( func.getValue(x+delta) - func.getValue(x) ) );
 		}
-
-		return res;
 	}
 
-	this.countPolyDerivative = function( points ) {
-		var res = [];
+	this.getFuncDerivValuesArray = function() {
+		return funcDerivValues;
+	}
+
+	function countPolyDerivative() {
+		polyDerivValues = [];
 		for ( var i = 0; i < points.length; i++ ) {
 			var x = points[i];
-			res.push( (1/delta) * ( poly.getValue(x+delta) - poly.getValue(x) ) );
+			polyDerivValues.push( (1/delta) * ( poly.getValue(x+delta) - poly.getValue(x) ) );
 		}
-
-		return res;
 	}
 
-    /*Interpolator.prototype.setNodesNum = function( n ) {
-        var LOWER_BOUND = 0, HIGHER_BOUND = 200;
-        var correct = isNumber(n) && ( n > LOWER_BOUND && n <= HIGHER_BOUND );
-        if( correct )
-            this.nodesNum = n;
-        else
-            alert( "Количество узлов интерполяции должно быть числом от " + LOWER_BOUND + " до " + HIGHER_BOUND );
-
-        return correct;
-    }
-
-    Interpolator.prototype.setIntrplWindow = function( a, b, c, d ) {
-        var LOWER_BOUND = -100, HIGHER_BOUND = 100;
-        var correct = true;
-
-        correct &= isNumber(a) >= LOWER_BOUND && a <= HIGHER_BOUND;
-        correct &= isNumber(b) >= LOWER_BOUND && b <= HIGHER_BOUND;
-        correct &= isNumber(c) >= LOWER_BOUND && c <= HIGHER_BOUND;
-        correct &= isNumber(d)  >= LOWER_BOUND && d <= HIGHER_BOUND;
-
-        if( correct ) {
-            this.windowA = a;
-            this.windowB = b;
-            this.windowC = c;
-            this.windowD = d;
-        }
-        else
-            alert( "Все координаты точек, задающих размер окна, должны быть числами в диапазоне от " + LOWER_BOUND + " до " + HIGHER_BOUND );
-
-        return correct;
-    }
-
-    Interpolator.prototype.setDelta = function( d ) {
-        var ALLOWED_VALUES = [ 1, 1e-1, 1e-2, 1e-3, 1e-4 ];
-        var correct = isNumber(d);
-
-        for (var i = 0; i < ALLOWED_VALUES.length; i++) {
-            correct |= (d == ALLOWED_VALUES[i]);
-        }
-
-        if( correct )
-            this.delta = d;
-        else {
-            var buffer = "";
-            for (var i = 0; i < ALLOWED_VALUES.length; i++) {
-                buffer += ALLOWED_VALUES[i] + " ";
-            }
-            alert( "Дельта должна принимать одно из следующих значений: " + buffer );
-        }
-
-        return correct;
-    }*/
+	this.getPolyDerivValuesArray = function() {
+		return polyDerivValues;
+	}
 }

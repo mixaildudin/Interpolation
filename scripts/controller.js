@@ -1,37 +1,72 @@
-var windowA = 0, windowB = 5, windowC = -15, windowD = 15;
-var n = 4;
-var delta = 1e-4;
+function Controller() {
 
-$(document).ready( function() {
-	var w = { A: windowA, B: windowB, C: windowC, D: windowD };
-	var func = new ObjFunc( 2, 4, 6, 1, 1 );
-	var o = new Interpolator( func, n, delta, w );
 	var view = new View( getEl('plot') );
+	var interpolator = new Interpolator();
+	var intrpWindow = {};
+	var points = [];
 
-	o.start();
+	this.start = function() {
+		intrpWindow = {
+			'A': +getEl('windowA_input').value,
+			'B': +getEl('windowB_input').value,
+			'C': +getEl('windowC_input').value,
+			'D': +getEl('windowD_input').value
+		};
 
-	var points = createPointsArray();
-	var funcValues = o.countFuncValues( points );
-	var polyValues = o.countPolyValues( points );
-	var diffValues = o.countDiffValues( points );
-	var funcDerivValues = o.countFuncDerivative( points );
-	var polyDerivValues = o.countPolyDerivative( points );
+		var func = new ObjFunc(
+			+getEl('alpha_input').value,
+			+getEl('beta_input').value,
+			+getEl('gamma_input').value,
+			+getEl('delta_input').value,
+			+getEl('eps_input').value
+		);
 
-	view.clear();
-	view.addPlot( points, funcValues, 'f(x)', '#f00' );
-	view.addPlot( points, polyValues, 'p(x)', '#00f' );
-	view.addPlot( points, diffValues, 'r(x)', '#0f0' );
-	view.addPlot( points, funcDerivValues, '∂f(x)', '#FF00FF' );
-	view.addPlot( points, polyDerivValues, '∂p(x)', '#FFA500' );
-	view.draw( w );
-});
+		interpolator.setObjFunction( func );
+		interpolator.setNodesNum( +getEl('n_input').value );
+		interpolator.setIntrpInterval( intrpWindow.A, intrpWindow.B );
+		interpolator.setDelta( +getEl('delta_deriv_input').value );
+		points = createPointsArray();
+		interpolator.setPoints( points );
 
-function createPointsArray() {
-	var step = (windowB - windowA) / $('#plot').width();
-	var result = [];
-	for ( var i = windowA; i < windowB ; i += step )
-		result.push(i);
-	result.push( windowB ); //иначе правая граница может быть не учтена из-за погрешностей
+		interpolator.start();
 
-	return result;
+		this.drawAccordingToChoices();
+
+		showMaxDifference();
+	}
+
+	function createPointsArray() {
+		var windowA = +getEl('windowA_input').value,
+			windowB = +getEl('windowB_input').value;
+		var step = (windowB - windowA) / $('#plot').width();
+		var result = [];
+		for ( var i = windowA; i < windowB ; i += step )
+			result.push(i);
+		result.push( windowB ); //иначе правая граница может быть не учтена из-за погрешностей
+
+		return result;
+	}
+
+	this.drawAccordingToChoices = function(){
+		view.clear();
+		if( getEl('draw_f').checked )
+			view.addPlot( points, interpolator.getFuncValuesArray(), 'f(x)', '#f00' );
+		if( getEl('draw_p').checked )
+			view.addPlot( points, interpolator.getPolyValuesArray(), 'p(x)', '#00f' );
+		if( getEl('draw_r').checked )
+			view.addPlot( points, interpolator.getDiffValuesArray(), 'r(x)', '#0f0' );
+		if( getEl('draw_fd').checked )
+			view.addPlot( points, interpolator.getFuncDerivValuesArray(), '∂f(x)', '#FF00FF' );
+		if( getEl('draw_pd').checked )
+			view.addPlot( points, interpolator.getPolyDerivValuesArray(), '∂p(x)', '#FFA500' );
+
+		view.draw( intrpWindow );
+	}
+
+	function showMaxDifference() {
+		var max = interpolator.getMaxDiffValue();
+
+		getEl('max_rx').innerHTML = max.val;
+		getEl('max_rx_x').innerHTML = max.x;
+	}
 }
