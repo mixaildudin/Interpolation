@@ -22,7 +22,7 @@ function Controller() {
 		);
 
 		interpolator.setObjFunction( func );
-		interpolator.setNodesNum( +getEl('n_input').value );
+		interpolator.setNodesNum( (getEl('n_input').value - 2)/2 );
 		interpolator.setIntrpInterval( intrpWindow.A, intrpWindow.B );
 		interpolator.setDelta( +getEl('delta_deriv_input').value );
 		points = createPointsArray();
